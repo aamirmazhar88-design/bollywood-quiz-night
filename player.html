@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Join Bollywood Quiz</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#141E30,#243B55);
+    color:white;
+    text-align:center;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:0;
+}
+
+
+.box {
+    background:rgba(255,255,255,0.1);
+    padding:40px;
+    border-radius:20px;
+    width:80%;
+    max-width:400px;
+}
+
+
+input {
+
+    width:90%;
+    padding:15px;
+    margin:10px;
+    font-size:20px;
+    border-radius:10px;
+    border:none;
+
+}
+
+
+button {
+
+    background:#FFD700;
+    border:none;
+    padding:15px 40px;
+    font-size:22px;
+    border-radius:10px;
+    cursor:pointer;
+
+}
+
+
+#message {
+
+    margin-top:20px;
+    font-size:22px;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="box">
+
+
+<h1>🎬 Bollywood Quiz Night</h1>
+
+<h2>Join Game</h2>
+
+
+<input id="pin" placeholder="Enter Game PIN">
+
+
+<input id="name" placeholder="Your Name">
+
+
+<button id="join">
+JOIN
+</button>
+
+
+<div id="message"></div>
+
+
+</div>
+
+
+
+<script type="module">
+
+
+import { database } from "./firebase.js";
+
+
+import {
+
+ref,
+set
+
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+
+
+document.getElementById("join").onclick = function(){
+
+
+const pin =
+document.getElementById("pin").value;
+
+
+const name =
+document.getElementById("name").value;
+
+
+
+if(!pin || !name){
+
+document.getElementById("message").innerText =
+"Enter PIN and name";
+
+return;
+
+}
+
+
+
+const playerRef =
+ref(database,
+"games/"+pin+"/players/"+name);
+
+
+
+set(playerRef,name)
+.then(()=>{
+
+
+document.getElementById("message").innerText =
+"🎉 Joined successfully!";
+
+
+});
+
+
+};
+
+
+</script>
+
+
+</body>
+
+</html>
