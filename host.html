@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bollywood Quiz Night - Host</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141E30, #243B55);
+            color: white;
+            text-align: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 50px;
+        }
+
+        .pin {
+            font-size: 80px;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 20px;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            width: 70%;
+            margin:auto;
+        }
+
+        .players {
+            font-size: 30px;
+            margin-top:20px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="box">
+
+<h1>🎬 Bollywood Quiz Night</h1>
+
+<h2>Game PIN</h2>
+
+<div class="pin" id="gamePin">
+    Loading...
+</div>
+
+
+<div class="players">
+    Players Joined:
+    <span id="playerCount">0</span>/8
+</div>
+
+
+<div id="playerList"></div>
+
+</div>
+
+
+
+<script type="module">
+
+import { database } from "./firebase.js";
+
+import { 
+    ref,
+    set,
+    onValue
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+
+// Generate random 4 digit PIN
+
+function generatePIN(){
+    return Math.floor(1000 + Math.random()*9000);
+}
+
+
+const gamePin = generatePIN();
+
+document.getElementById("gamePin").innerText = gamePin;
+
+
+// Create game room
+
+const gameRef = ref(database, "games/" + gamePin);
+
+
+set(gameRef,{
+    status:"waiting",
+    createdAt:Date.now()
+});
+
+
+// Listen for players joining
+
+const playersRef = ref(database, "games/" + gamePin + "/players");
+
+
+onValue(playersRef,(snapshot)=>{
+
+    const players = snapshot.val();
+
+    if(players){
+
+        const names = Object.values(players);
+
+        document.getElementById("playerCount").innerText = names.length;
+
+        document.getElementById("playerList").innerHTML =
+        names.map(name => "✅ " + name).join("<br>");
+
+    }
+
+});
+
+
+</script>
+
+
+</body>
+</html>
