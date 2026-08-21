@@ -3,16 +3,16 @@
 
 <head>
 
-<title>Join Bollywood Quiz</title>
+<title>Bollywood Quiz Player</title>
 
 <style>
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#141E30,#243B55);
+    font-family:Arial;
+    background:linear-gradient(135deg,#141E30,#243B55);
     color:white;
     text-align:center;
-    height:100vh;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -20,46 +20,52 @@ body {
 }
 
 
-.box {
+.box{
     background:rgba(255,255,255,0.1);
-    padding:40px;
+    padding:30px;
     border-radius:20px;
-    width:80%;
-    max-width:400px;
+    width:85%;
+    max-width:500px;
 }
 
 
-input {
+input{
 
-    width:90%;
-    padding:15px;
-    margin:10px;
-    font-size:20px;
-    border-radius:10px;
-    border:none;
-
-}
-
-
-button {
-
-    background:#FFD700;
-    border:none;
-    padding:15px 40px;
-    font-size:22px;
-    border-radius:10px;
-    cursor:pointer;
+width:90%;
+padding:15px;
+margin:10px;
+font-size:20px;
+border-radius:10px;
 
 }
 
 
-#message {
+button{
 
-    margin-top:20px;
-    font-size:22px;
+width:90%;
+padding:15px;
+margin:10px;
+font-size:20px;
+border-radius:10px;
+border:none;
+cursor:pointer;
 
 }
 
+
+.answer{
+
+background:#333;
+color:white;
+
+}
+
+
+#questionArea{
+
+display:none;
+
+}
 
 </style>
 
@@ -72,23 +78,49 @@ button {
 <div class="box">
 
 
-<h1>🎬 Bollywood Quiz Night</h1>
+<h1>🎬 Bollywood Quiz</h1>
+
+
+<div id="joinArea">
+
 
 <h2>Join Game</h2>
 
-
-<input id="pin" placeholder="Enter Game PIN">
-
+<input id="pin" placeholder="Game PIN">
 
 <input id="name" placeholder="Your Name">
-
 
 <button id="join">
 JOIN
 </button>
 
 
-<div id="message"></div>
+</div>
+
+
+
+<div id="waitingArea" style="display:none">
+
+<h2>✅ Joined!</h2>
+
+<p>Waiting for host to start...</p>
+
+</div>
+
+
+
+<div id="questionArea">
+
+<h2 id="questionNumber"></h2>
+
+<h2 id="question"></h2>
+
+
+<div id="answers"></div>
+
+
+</div>
+
 
 
 </div>
@@ -104,28 +136,30 @@ import { database } from "./firebase.js";
 import {
 
 ref,
-set
+set,
+onValue
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
 
 
-document.getElementById("join").onclick = function(){
-
-
-const pin =
-document.getElementById("pin").value;
-
-
-const name =
-document.getElementById("name").value;
+let gamePin;
+let playerName;
 
 
 
-if(!pin || !name){
+document.getElementById("join").onclick=()=>{
 
-document.getElementById("message").innerText =
-"Enter PIN and name";
+
+gamePin=document.getElementById("pin").value;
+
+playerName=document.getElementById("name").value;
+
+
+
+if(!gamePin || !playerName){
+
+alert("Enter PIN and name");
 
 return;
 
@@ -133,24 +167,128 @@ return;
 
 
 
-const playerRef =
+set(
+
 ref(database,
-"games/"+pin+"/players/"+name);
+"games/"+gamePin+"/players/"+playerName),
+
+playerName
+
+);
 
 
 
-set(playerRef,name)
-.then(()=>{
+document.getElementById("joinArea").style.display="none";
+
+document.getElementById("waitingArea").style.display="block";
 
 
-document.getElementById("message").innerText =
-"🎉 Joined successfully!";
+
+// Listen for game start
+
+
+const gameRef =
+ref(database,"games/"+gamePin);
+
+
+
+onValue(gameRef,(snapshot)=>{
+
+
+const game=snapshot.val();
+
+
+
+if(game && game.status==="playing"){
+
+
+loadQuestion(game.currentQuestion);
+
+
+}
+
 
 
 });
 
 
 };
+
+
+
+
+
+function loadQuestion(index){
+
+
+fetch("questions.js")
+
+.then(()=>{
+
+
+import("./questions.js")
+
+.then(module=>{
+
+
+const questions=module.questions;
+
+
+const q=questions[index];
+
+
+
+document.getElementById("waitingArea").style.display="none";
+
+document.getElementById("questionArea").style.display="block";
+
+
+
+document.getElementById("questionNumber").innerText=
+
+"Question "+(index+1);
+
+
+
+document.getElementById("question").innerText=
+
+q.question;
+
+
+
+const answers=document.getElementById("answers");
+
+
+answers.innerHTML="";
+
+
+
+q.options.forEach((option)=>{
+
+
+const btn=document.createElement("button");
+
+
+btn.className="answer";
+
+btn.innerText=option;
+
+
+answers.appendChild(btn);
+
+
+});
+
+
+
+});
+
+
+});
+
+
+}
+
 
 
 </script>
