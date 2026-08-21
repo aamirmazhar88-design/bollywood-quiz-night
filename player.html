@@ -8,64 +8,143 @@
 <style>
 
 body {
-    font-family:Arial;
-    background:linear-gradient(135deg,#141E30,#243B55);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#141E30,#243B55);
     color:white;
-    text-align:center;
     min-height:100vh;
+    margin:0;
     display:flex;
     justify-content:center;
     align-items:center;
-    margin:0;
 }
 
 
-.box{
-    background:rgba(255,255,255,0.1);
-    padding:30px;
-    border-radius:20px;
-    width:85%;
+.box {
+
+    background:rgba(255,255,255,0.12);
+    padding:35px;
+    border-radius:25px;
+    width:90%;
     max-width:500px;
-}
-
-
-input{
-
-width:90%;
-padding:15px;
-margin:10px;
-font-size:20px;
-border-radius:10px;
+    text-align:center;
 
 }
 
 
-button{
+h1 {
 
-width:90%;
-padding:15px;
-margin:10px;
-font-size:20px;
-border-radius:10px;
-border:none;
-cursor:pointer;
+    font-size:35px;
 
 }
 
 
-.answer{
+input {
 
-background:#333;
-color:white;
+    width:85%;
+    padding:15px;
+    margin:10px;
+    border-radius:12px;
+    border:none;
+    font-size:20px;
 
 }
 
 
-#questionArea{
+button {
+
+    width:90%;
+    padding:18px;
+    margin:10px;
+    border-radius:15px;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+    font-weight:bold;
+
+}
+
+
+.joinBtn {
+
+    background:#FFD700;
+
+}
+
+
+.answer {
+
+    background:#333;
+    color:white;
+    transition:0.2s;
+
+}
+
+
+.answer:hover {
+
+    transform:scale(1.03);
+
+}
+
+
+.answer:disabled {
+
+    opacity:0.5;
+    cursor:not-allowed;
+
+}
+
+
+.red {
+
+background:#e74c3c;
+
+}
+
+
+.blue {
+
+background:#3498db;
+
+}
+
+
+.yellow {
+
+background:#f1c40f;
+color:black;
+
+}
+
+
+.green {
+
+background:#2ecc71;
+
+}
+
+
+#questionArea {
 
 display:none;
 
 }
+
+
+#waitingArea {
+
+display:none;
+
+}
+
+
+.timer {
+
+font-size:30px;
+color:#FFD700;
+
+}
+
 
 </style>
 
@@ -78,20 +157,28 @@ display:none;
 <div class="box">
 
 
-<h1>🎬 Bollywood Quiz</h1>
+<h1>🎬 Bollywood Quiz Night</h1>
 
+
+<!-- JOIN SCREEN -->
 
 <div id="joinArea">
 
-
 <h2>Join Game</h2>
 
-<input id="pin" placeholder="Game PIN">
 
-<input id="name" placeholder="Your Name">
+<input id="pin"
+placeholder="Game PIN">
 
-<button id="join">
-JOIN
+
+<input id="name"
+placeholder="Your Name">
+
+
+<button class="joinBtn" id="join">
+
+JOIN 🎬
+
 </button>
 
 
@@ -99,31 +186,56 @@ JOIN
 
 
 
-<div id="waitingArea" style="display:none">
+<!-- WAITING SCREEN -->
 
-<h2>✅ Joined!</h2>
+<div id="waitingArea">
 
-<p>Waiting for host to start...</p>
+<h2>🎉 Joined!</h2>
+
+<p id="playerDisplay"></p>
+
+<h3>
+Waiting for host...
+</h3>
 
 </div>
 
 
 
+<!-- QUESTION SCREEN -->
+
 <div id="questionArea">
+
 
 <h2 id="questionNumber"></h2>
 
-<h2 id="question"></h2>
+
+<div class="timer">
+
+⏱ <span id="timer">15</span>
+
+</div>
+
+
+<h2 id="questionText"></h2>
+
 
 
 <div id="answers"></div>
 
 
-</div>
+
+<p id="submitMessage"></p>
 
 
 
 </div>
+
+
+
+</div>
+
+
 
 
 
@@ -144,22 +256,33 @@ onValue
 
 
 let gamePin;
+
 let playerName;
+
+let currentQuestionIndex;
+
+let answered=false;
+
+let startTime;
+
 
 
 
 document.getElementById("join").onclick=()=>{
 
 
-gamePin=document.getElementById("pin").value;
+gamePin =
+document.getElementById("pin").value;
 
-playerName=document.getElementById("name").value;
+
+playerName =
+document.getElementById("name").value.trim();
 
 
 
 if(!gamePin || !playerName){
 
-alert("Enter PIN and name");
+alert("Please enter PIN and name");
 
 return;
 
@@ -167,12 +290,21 @@ return;
 
 
 
+
+// Add player
+
 set(
 
 ref(database,
-"games/"+gamePin+"/players/"+playerName),
+`games/${gamePin}/players/${playerName}`),
 
-playerName
+{
+
+name:playerName,
+
+score:0
+
+}
 
 );
 
@@ -182,13 +314,27 @@ document.getElementById("joinArea").style.display="none";
 
 document.getElementById("waitingArea").style.display="block";
 
+document.getElementById("playerDisplay").innerText =
+"Welcome "+playerName;
 
 
-// Listen for game start
+
+listenForGame();
+
+
+
+};
+
+
+
+
+
+function listenForGame(){
+
 
 
 const gameRef =
-ref(database,"games/"+gamePin);
+ref(database,`games/${gamePin}`);
 
 
 
@@ -199,7 +345,11 @@ const game=snapshot.val();
 
 
 
-if(game && game.status==="playing"){
+if(!game) return;
+
+
+
+if(game.status==="playing"){
 
 
 loadQuestion(game.currentQuestion);
@@ -212,29 +362,45 @@ loadQuestion(game.currentQuestion);
 });
 
 
-};
+
+}
 
 
 
 
 
-function loadQuestion(index){
 
 
-fetch("questions.js")
-
-.then(()=>{
+async function loadQuestion(index){
 
 
-import("./questions.js")
 
-.then(module=>{
-
-
-const questions=module.questions;
+if(currentQuestionIndex===index)
+return;
 
 
-const q=questions[index];
+
+currentQuestionIndex=index;
+
+answered=false;
+
+startTime=Date.now();
+
+
+
+// load questions
+
+const module =
+await import("./questions.js");
+
+
+const questions =
+module.questions;
+
+
+
+const q =
+questions[index];
 
 
 
@@ -244,50 +410,178 @@ document.getElementById("questionArea").style.display="block";
 
 
 
-document.getElementById("questionNumber").innerText=
+document.getElementById("questionNumber").innerText =
 
-"Question "+(index+1);
+`Question ${index+1}/${questions.length}`;
 
 
 
-document.getElementById("question").innerText=
+document.getElementById("questionText").innerText =
 
 q.question;
 
 
 
-const answers=document.getElementById("answers");
+const answerBox =
+document.getElementById("answers");
 
 
-answers.innerHTML="";
+answerBox.innerHTML="";
 
 
 
-q.options.forEach((option)=>{
+const colours=[
+
+"red",
+"blue",
+"yellow",
+"green"
+
+];
+
+
+
+q.options.forEach((option,i)=>{
 
 
 const btn=document.createElement("button");
 
 
-btn.className="answer";
-
 btn.innerText=option;
 
 
-answers.appendChild(btn);
+btn.className="answer "+colours[i];
+
+
+btn.onclick=()=>submitAnswer(i);
+
+
+answerBox.appendChild(btn);
+
 
 
 });
 
 
 
-});
+startTimer();
 
-
-});
 
 
 }
+
+
+
+
+
+
+
+function submitAnswer(choice){
+
+
+
+if(answered)
+return;
+
+
+answered=true;
+
+
+
+const reactionTime =
+
+(Date.now()-startTime)/1000;
+
+
+
+// Disable buttons
+
+document
+.querySelectorAll(".answer")
+.forEach(btn=>{
+
+btn.disabled=true;
+
+});
+
+
+
+
+set(
+
+ref(database,
+
+`games/${gamePin}/answers/${currentQuestionIndex}/${playerName}`),
+
+{
+
+answer:choice,
+
+time:reactionTime,
+
+submitted:true
+
+}
+
+);
+
+
+
+document.getElementById("submitMessage").innerText =
+
+"✅ Answer submitted! Waiting for results...";
+
+
+
+}
+
+
+
+
+
+
+function startTimer(){
+
+
+let time=15;
+
+
+document.getElementById("timer").innerText=time;
+
+
+
+const interval=setInterval(()=>{
+
+
+time--;
+
+
+document.getElementById("timer").innerText=time;
+
+
+
+if(time<=0){
+
+clearInterval(interval);
+
+
+if(!answered){
+
+document.getElementById("submitMessage").innerText=
+
+"⏰ Time's up!";
+
+}
+
+}
+
+
+},1000);
+
+
+}
+
+
 
 
 
