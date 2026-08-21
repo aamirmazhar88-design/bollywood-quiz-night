@@ -1,68 +1,123 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Bollywood Quiz Night - Host</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #141E30, #243B55);
-            color: white;
-            text-align: center;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+<title>Bollywood Quiz Night - Host</title>
 
-        h1 {
-            font-size: 50px;
-        }
+<style>
 
-        .pin {
-            font-size: 80px;
-            font-weight: bold;
-            color: #FFD700;
-            margin: 20px;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#141E30,#243B55);
+    color:white;
+    text-align:center;
+    min-height:100vh;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-        .box {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 20px;
-            width: 70%;
-            margin:auto;
-        }
 
-        .players {
-            font-size: 30px;
-            margin-top:20px;
-        }
-    </style>
+.box {
+    background:rgba(255,255,255,0.1);
+    padding:40px;
+    border-radius:25px;
+    width:80%;
+    max-width:900px;
+}
+
+
+h1 {
+    font-size:50px;
+}
+
+
+.pin {
+    font-size:80px;
+    color:#FFD700;
+    font-weight:bold;
+}
+
+
+.question {
+
+    font-size:40px;
+    margin:30px;
+
+}
+
+
+button {
+
+    background:#FFD700;
+    border:none;
+    padding:18px 40px;
+    font-size:25px;
+    border-radius:15px;
+    cursor:pointer;
+    margin:15px;
+
+}
+
+
+.players {
+
+    font-size:25px;
+
+}
+
+
+</style>
+
 </head>
+
 
 
 <body>
 
+
 <div class="box">
 
+
 <h1>🎬 Bollywood Quiz Night</h1>
+
 
 <h2>Game PIN</h2>
 
 <div class="pin" id="gamePin">
-    Loading...
+Loading...
 </div>
 
 
+
 <div class="players">
-    Players Joined:
-    <span id="playerCount">0</span>/8
+
+Players Joined:
+<span id="playerCount">0</span>
+
 </div>
 
 
 <div id="playerList"></div>
+
+
+
+<button id="startBtn">
+🎬 Start Game
+</button>
+
+
+
+<div id="gameArea"></div>
+
+
+<button id="nextBtn" style="display:none;">
+Next Question →
+</button>
+
+
 
 </div>
 
@@ -70,63 +125,194 @@
 
 <script type="module">
 
+
 import { database } from "./firebase.js";
 
-import { 
-    ref,
-    set,
-    onValue
+import { questions } from "./questions.js";
+
+
+import {
+
+ref,
+set,
+onValue,
+update
+
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
 
-// Generate random 4 digit PIN
+
+
+// Create PIN
 
 function generatePIN(){
-    return Math.floor(1000 + Math.random()*9000);
+
+return Math.floor(1000 + Math.random()*9000);
+
 }
+
 
 
 const gamePin = generatePIN();
 
+
 document.getElementById("gamePin").innerText = gamePin;
 
 
-// Create game room
 
-const gameRef = ref(database, "games/" + gamePin);
+const gameRef = ref(database,"games/"+gamePin);
+
 
 
 set(gameRef,{
-    status:"waiting",
-    createdAt:Date.now()
+
+status:"waiting",
+
+currentQuestion:0,
+
+createdAt:Date.now()
+
 });
 
 
-// Listen for players joining
 
-const playersRef = ref(database, "games/" + gamePin + "/players");
+
+// Players listener
+
+
+const playersRef =
+ref(database,"games/"+gamePin+"/players");
 
 
 onValue(playersRef,(snapshot)=>{
 
-    const players = snapshot.val();
 
-    if(players){
+const players=snapshot.val();
 
-        const names = Object.values(players);
 
-        document.getElementById("playerCount").innerText = names.length;
+if(players){
 
-        document.getElementById("playerList").innerHTML =
-        names.map(name => "✅ " + name).join("<br>");
+const names=Object.values(players);
 
-    }
+
+document.getElementById("playerCount").innerText =
+names.length;
+
+
+document.getElementById("playerList").innerHTML =
+names.map(name=>"✅ "+name).join("<br>");
+
+
+}
+
 
 });
+
+
+
+
+
+let currentQuestion = 0;
+
+
+
+// Start Game
+
+
+document.getElementById("startBtn").onclick = ()=>{
+
+
+currentQuestion=0;
+
+
+update(gameRef,{
+
+status:"playing",
+
+currentQuestion:currentQuestion
+
+});
+
+
+showQuestion();
+
+
+};
+
+
+
+
+
+function showQuestion(){
+
+
+const q = questions[currentQuestion];
+
+
+document.getElementById("gameArea").innerHTML=`
+
+<h2>Question ${currentQuestion+1}/${questions.length}</h2>
+
+<div class="question">
+
+${q.question}
+
+</div>
+
+`;
+
+
+document.getElementById("nextBtn").style.display="inline-block";
+
+
+}
+
+
+
+
+
+// Next question
+
+
+document.getElementById("nextBtn").onclick=()=>{
+
+
+currentQuestion++;
+
+
+if(currentQuestion < questions.length){
+
+
+update(gameRef,{
+
+currentQuestion:currentQuestion
+
+});
+
+
+showQuestion();
+
+
+}
+
+else{
+
+
+document.getElementById("gameArea").innerHTML=
+
+"<h1>🏆 Game Finished!</h1>";
+
+}
+
+
+};
+
+
 
 
 </script>
 
 
 </body>
+
 </html>
