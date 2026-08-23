@@ -3,23 +3,29 @@
 
 <head>
 
-<title>Natasha's Bollywood Quiz Night - Host</title>
-
+<title>Natasha's Bollywood Birthday Quiz</title>
 
 <style>
 
-body {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
-font-family: Arial, sans-serif;
 
-background:
-linear-gradient(135deg,#141E30,#243B55);
+*{
+    box-sizing:border-box;
+}
 
-color:white;
 
-min-height:100vh;
+body{
 
 margin:0;
+
+height:100vh;
+
+overflow:hidden;
+
+font-family:'Poppins',sans-serif;
+
+color:white;
 
 display:flex;
 
@@ -27,101 +33,134 @@ justify-content:center;
 
 align-items:center;
 
-overflow:hidden;
+background:
+
+radial-gradient(circle at top,#ff416c,#7b1fa2 40%,#090014 90%);
 
 }
 
 
 
-/* FLOATING POSTERS */
+/* MOVING LIGHTS */
 
-.poster-wall {
+body:before{
 
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-overflow:hidden;
-
-pointer-events:none;
-
-z-index:0;
-
-}
-
-
-.poster {
+content:"";
 
 position:absolute;
 
-width:150px;
+width:200%;
 
-opacity:0.18;
+height:200%;
 
-filter:grayscale(40%) brightness(70%);
+background:
 
-border-radius:20px;
+linear-gradient(
+120deg,
+transparent 45%,
+rgba(255,215,0,0.15),
+transparent 55%
+);
 
-animation:floatPoster 18s infinite ease-in-out;
-
-}
-
-
-
-.poster:nth-child(1){
-
-left:3%;
-
-top:10%;
+animation:lights 8s infinite linear;
 
 }
 
 
-.poster:nth-child(2){
-
-left:5%;
-
-top:60%;
-
-animation-delay:4s;
-
-}
-
-
-.poster:nth-child(3){
-
-right:4%;
-
-top:15%;
-
-animation-delay:2s;
-
-}
-
-
-.poster:nth-child(4){
-
-right:6%;
-
-top:60%;
-
-animation-delay:6s;
-
-}
-
-
-
-@keyframes floatPoster {
+@keyframes lights{
 
 0%{
+transform:translate(-50%,-50%) rotate(0deg);
+}
 
-transform:translateY(0px);
+100%{
+transform:translate(-50%,-50%) rotate(360deg);
+}
+
+}
+
+
+
+/* POSTERS */
+
+.poster-wall{
+
+position:absolute;
+
+top:0;
+
+height:100vh;
+
+width:220px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:25px;
+
+overflow:hidden;
+
+z-index:1;
+
+}
+
+
+
+.left{
+
+left:20px;
+
+}
+
+
+.right{
+
+right:20px;
+
+}
+
+
+
+.poster{
+
+width:150px;
+
+border-radius:18px;
+
+opacity:0.55;
+
+filter:
+
+brightness(70%)
+
+contrast(90%);
+
+box-shadow:
+
+0 0 25px rgba(255,215,0,0.5);
+
+animation:
+
+float 8s infinite ease-in-out;
+
+}
+
+
+
+.poster:nth-child(even){
+
+animation-delay:3s;
+
+}
+
+
+
+@keyframes float{
+
+0%,100%{
+
+transform:translateY(0);
 
 }
 
@@ -131,34 +170,39 @@ transform:translateY(-35px);
 
 }
 
-100%{
-
-transform:translateY(0px);
-
-}
-
 }
 
 
 
 
-.container {
+/* MAIN CARD */
+
+
+.container{
 
 position:relative;
 
-z-index:2;
+z-index:5;
 
-width:90%;
+width:650px;
 
-max-width:1000px;
+padding:45px;
 
-background:rgba(255,255,255,0.12);
+border-radius:35px;
 
-backdrop-filter:blur(15px);
+background:
 
-padding:40px;
+rgba(255,255,255,0.12);
 
-border-radius:30px;
+backdrop-filter:blur(20px);
+
+border:
+
+1px solid rgba(255,255,255,0.3);
+
+box-shadow:
+
+0 0 50px rgba(0,0,0,0.5);
 
 text-align:center;
 
@@ -166,31 +210,122 @@ text-align:center;
 
 
 
-h1 {
-
-font-size:55px;
-
-color:#FFD700;
-
-}
 
 
+h1{
 
-.pin {
+font-size:48px;
 
-font-size:70px;
+margin:0;
 
-font-weight:bold;
+font-weight:800;
 
-color:#FFD700;
+color:#ffd700;
+
+text-shadow:
+
+0 0 20px #ffd700;
 
 }
 
 
 
-.question {
+.subtitle{
 
-font-size:45px;
+font-size:20px;
+
+margin-top:10px;
+
+}
+
+
+
+.pin-title{
+
+margin-top:30px;
+
+font-size:22px;
+
+}
+
+
+
+.pin{
+
+font-size:80px;
+
+font-weight:800;
+
+color:#ffd700;
+
+letter-spacing:8px;
+
+}
+
+
+
+.players{
+
+font-size:24px;
+
+margin:20px;
+
+}
+
+
+
+button{
+
+background:
+
+linear-gradient(45deg,#ffd700,#ff9f00);
+
+border:none;
+
+padding:18px 45px;
+
+border-radius:50px;
+
+font-size:24px;
+
+font-weight:800;
+
+cursor:pointer;
+
+color:#111;
+
+box-shadow:
+
+0 0 30px rgba(255,215,0,0.7);
+
+transition:.3s;
+
+}
+
+
+
+button:hover{
+
+transform:scale(1.08);
+
+}
+
+
+
+
+.player{
+
+font-size:22px;
+
+margin:8px;
+
+}
+
+
+
+.question{
+
+font-size:40px;
 
 margin:30px;
 
@@ -198,59 +333,27 @@ margin:30px;
 
 
 
-button {
-
-background:#FFD700;
-
-border:none;
-
-padding:18px 35px;
-
-font-size:25px;
-
-font-weight:bold;
-
-border-radius:15px;
-
-cursor:pointer;
-
-margin:10px;
-
-}
-
-
-
-.timer {
+.timer{
 
 font-size:45px;
 
-color:#ffdd00;
+color:#ffd700;
 
 }
 
 
 
-.leaderboard {
+.leaderboard{
 
 font-size:28px;
 
 text-align:left;
 
-margin-top:30px;
-
 }
 
 
 
-.player {
-
-margin:10px;
-
-}
-
-
-
-.hidden {
+.hidden{
 
 display:none;
 
@@ -268,7 +371,6 @@ display:none;
 
 </style>
 
-
 </head>
 
 
@@ -276,7 +378,7 @@ display:none;
 
 
 
-<!-- BACKGROUND MUSIC -->
+<!-- MUSIC -->
 
 <audio id="bgMusic" loop>
 
@@ -286,24 +388,35 @@ display:none;
 
 
 
-<!-- FLOATING MOVIE POSTERS -->
-
-<div class="poster-wall">
 
 
-<img class="poster" src="assets/posters/poster 1.jpeg">
+<!-- LEFT POSTERS -->
 
+<div class="poster-wall left">
 
-<img class="poster" src="assets/posters/poster 2.jpeg">
+<img class="poster" src="assets/posters/poster01.jpeg">
 
+<img class="poster" src="assets/posters/poster02.jpeg">
 
-<img class="poster" src="assets/posters/poster 3.jpeg">
-
-
-<img class="poster" src="assets/posters/poster 4.jpeg">
-
+<img class="poster" src="assets/posters/poster03.jpeg">
 
 </div>
+
+
+
+<!-- RIGHT POSTERS -->
+
+<div class="poster-wall right">
+
+<img class="poster" src="assets/posters/poster04.jpeg">
+
+<img class="poster" src="assets/posters/poster05.jpeg">
+
+<img class="poster" src="assets/posters/poster06.jpeg">
+
+</div>
+
+
 
 
 
@@ -313,11 +426,18 @@ display:none;
 
 
 <h1>
-🎬 Natasha's Bollywood Quiz Night
+🎬 Natasha's Bollywood Birthday Quiz
 </h1>
 
 
-<h2>Game PIN</h2>
+<div class="subtitle">
+A cinematic night of movies, music & memories ✨
+</div>
+
+
+<div class="pin-title">
+GAME PIN
+</div>
 
 
 <div class="pin" id="pin">
@@ -328,10 +448,13 @@ Loading...
 
 
 
-<h2>
+<div class="players">
+
 Players:
-<span id="playerCount">0</span>
-</h2>
+<span id="playerCount">0</span>/8
+
+</div>
+
 
 
 <div id="playerList"></div>
@@ -361,21 +484,18 @@ Players:
 </div>
 
 
-<div class="question" id="question">
-
-</div>
+<div class="question" id="question"></div>
 
 
 <h2 id="answered">
-
-Answers: 0
-
+Answers:0
 </h2>
+
 
 
 <button id="revealBtn">
 
-👀 Reveal Results
+Reveal Results 👀
 
 </button>
 
@@ -386,19 +506,16 @@ Answers: 0
 
 
 
+
 <div id="results" class="hidden">
 
 
 <h1>
-
 🏆 Leaderboard
-
 </h1>
 
 
-<div id="leaderboard" class="leaderboard">
-
-</div>
+<div id="leaderboard" class="leaderboard"></div>
 
 
 <button id="nextBtn">
@@ -409,7 +526,6 @@ Next Question →
 
 
 </div>
-
 
 
 </div>
@@ -423,57 +539,42 @@ Next Question →
 <script type="module">
 
 
-import { database } from "./firebase.js";
+import {database} from "./firebase.js";
 
-import { questions } from "./questions.js";
+import {questions} from "./questions.js";
 
 
 import {
 
 ref,
-
 set,
-
 update,
-
 onValue,
-
 get
 
+}
 
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+from
+
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
 
 
 
-
-/* MUSIC START */
 
 const music=document.getElementById("bgMusic");
-
-
-document.addEventListener("click",()=>{
-
-music.play();
-
-});
-
-
-
 
 
 
 function generatePIN(){
 
-return Math.floor(1000 + Math.random()*9000);
+return Math.floor(1000+Math.random()*9000);
 
 }
 
 
 
-
 const gamePin=generatePIN();
-
 
 
 document.getElementById("pin").innerText=gamePin;
@@ -483,8 +584,6 @@ document.getElementById("pin").innerText=gamePin;
 const gameRef=
 
 ref(database,`games/${gamePin}`);
-
-
 
 
 
@@ -519,7 +618,7 @@ const players=snapshot.val();
 if(players){
 
 
-const list=Object.values(players);
+let list=Object.values(players);
 
 
 
@@ -529,20 +628,11 @@ document.getElementById("playerCount").innerText=list.length;
 
 document.getElementById("playerList").innerHTML=
 
-
-list.map(p=>
-
-
-`<div class="player">✅ ${p.name || p}</div>`
-
-
-).join("");
+list.map(p=>`<div class="player">✅ ${p.name||p}</div>`).join("");
 
 }
 
-
 });
-
 
 
 
@@ -551,9 +641,6 @@ list.map(p=>
 let currentQuestion=0;
 
 let timer;
-
-
-
 
 
 
@@ -584,50 +671,27 @@ startQuestion();
 
 
 
-
-
-
 function startQuestion(){
 
 
-const q=questions[currentQuestion];
+let q=questions[currentQuestion];
 
 
-
-document.getElementById("gameArea")
-.classList.remove("hidden");
+document.getElementById("gameArea").classList.remove("hidden");
 
 
-
-document.getElementById("results")
-.classList.add("hidden");
-
-
-
-document.getElementById("questionNumber")
-.innerText=
+document.getElementById("questionNumber").innerText=
 
 `Question ${currentQuestion+1}/${questions.length}`;
 
 
-
-document.getElementById("question")
-.innerText=q.question;
-
-
-
-document.getElementById("answered")
-.innerText="Answers: 0";
-
+document.getElementById("question").innerText=q.question;
 
 
 startTimer();
 
-listenAnswers();
-
 
 }
-
 
 
 
@@ -639,27 +703,21 @@ function startTimer(){
 let seconds=15;
 
 
-document.getElementById("timer").innerText=seconds;
-
-
 clearInterval(timer);
-
 
 
 timer=setInterval(()=>{
 
 
-seconds--;
-
-
 document.getElementById("timer").innerText=seconds;
 
 
-if(seconds<=0){
+seconds--;
+
+
+if(seconds<0)
 
 clearInterval(timer);
-
-}
 
 
 },1000);
@@ -673,243 +731,7 @@ clearInterval(timer);
 
 
 
-function listenAnswers(){
-
-
-const answerRef=
-
-ref(database,
-
-`games/${gamePin}/answers/${currentQuestion}`);
-
-
-
-onValue(answerRef,(snapshot)=>{
-
-
-const answers=snapshot.val();
-
-
-
-if(answers){
-
-
-document.getElementById("answered")
-.innerText=
-
-"Answers: "+Object.keys(answers).length;
-
-
-}
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-document.getElementById("revealBtn").onclick=async()=>{
-
-
-clearInterval(timer);
-
-
-const q=questions[currentQuestion];
-
-
-
-const answerRef=
-
-ref(database,
-
-`games/${gamePin}/answers/${currentQuestion}`);
-
-
-
-
-const snapshot=await get(answerRef);
-
-
-
-const answers=snapshot.val() || {};
-
-
-
-const playersSnapshot=
-
-await get(playersRef);
-
-
-
-const players=playersSnapshot.val();
-
-
-
-for(const name in answers){
-
-
-let score=0;
-
-
-
-if(answers[name].answer===q.answer){
-
-
-score=1000;
-
-
-}
-
-
-
-let oldScore=
-
-players[name].score || 0;
-
-
-
-await update(
-
-ref(database,
-
-`games/${gamePin}/players/${name}`),
-
-{
-
-score:oldScore+score
-
-}
-
-);
-
-
-}
-
-
-
-showLeaderboard();
-
-
-
-};
-
-
-
-
-
-
-
-async function showLeaderboard(){
-
-
-const snapshot=await get(playersRef);
-
-
-
-const players=snapshot.val();
-
-
-
-let ranking=Object.values(players);
-
-
-
-ranking.sort((a,b)=>b.score-a.score);
-
-
-
-document.getElementById("results")
-.classList.remove("hidden");
-
-
-
-document.getElementById("gameArea")
-.classList.add("hidden");
-
-
-
-document.getElementById("leaderboard")
-.innerHTML=
-
-
-ranking.map((p,i)=>{
-
-
-return `
-
-<div>
-
-${i===0?"🥇":i===1?"🥈":i===2?"🥉":"⭐"}
-
-${p.name}
-
--
-
-${p.score || 0}
-
-</div>
-
-`
-
-}).join("");
-
-
-
-}
-
-
-
-
-
-
-
-document.getElementById("nextBtn").onclick=()=>{
-
-
-currentQuestion++;
-
-
-
-if(currentQuestion < questions.length){
-
-
-update(gameRef,{
-
-currentQuestion
-
-});
-
-
-startQuestion();
-
-
-}
-
-else{
-
-
-document.getElementById("results")
-.innerHTML=
-
-"<h1>🎉 Game Finished!</h1>";
-
-}
-
-
-};
-
-
-
-
-
 </script>
-
 
 
 </body>
